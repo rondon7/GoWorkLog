@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1079049916295",
+    "project_id": "goworklog-2a7ff",
+    "storage_bucket": "goworklog-2a7ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079049916295:android:b5ec9382fca30a54bb0d22",
+        "android_client_info": {
+          "package_name": "com.makemytrip.goworklog"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079049916295-v8529hoaenop38j7egua06eo8ijcv12m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCp2nZgxv0dDUqccTdJensCEm2lKZN6jmM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079049916295-v8529hoaenop38j7egua06eo8ijcv12m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
