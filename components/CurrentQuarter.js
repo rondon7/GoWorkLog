@@ -1,5 +1,4 @@
 import {
-  View,
   Text,
   StyleSheet,
   SafeAreaView,
@@ -10,6 +9,7 @@ import { Card, Icon } from "@rneui/themed";
 import React, { useState } from "react";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Unorderedlist from 'react-native-unordered-list';
+
 const CurrentQuarter = ({ navigation }) => {
   const initialState = []
   for (let i = 0; i < 10; ++i) {
@@ -32,44 +32,21 @@ const CurrentQuarter = ({ navigation }) => {
         <Card>
           <Card.Title>Tasks To-Be-Done/Done</Card.Title>
           <Card.Divider />
-          <BouncyCheckbox
-            isChecked={checkboxState[0]["0"]}
-            text="Complete React Native Demo Assignment"
-            disableBuiltInState
-            onPress={() => { updateCheckBox(0) }}
+          <BouncyCheckbox isChecked={checkboxState[0]["0"]} text="Complete React Native Demo Assignment"
+            disableBuiltInState onPress={() => { updateCheckBox(0) }}
           />
-          <BouncyCheckbox
-            isChecked={checkboxState[1]["1"]}
-            text="Complete Company-sponsored Training"
-            disableBuiltInState
-            onPress={() => { updateCheckBox(1) }}
+          <BouncyCheckbox isChecked={checkboxState[1]["1"]} text="Complete Company-sponsored Training"
+            disableBuiltInState onPress={() => { updateCheckBox(1) }}
           />
-          <BouncyCheckbox
-            isChecked={checkboxState[2]["2"]}
-            text="Complete Code Setup in Local Machine"
-            disableBuiltInState
-            onPress={() => { updateCheckBox(2) }}
+          <BouncyCheckbox isChecked={checkboxState[2]["2"]} text="Complete Code Setup in Local Machine"
+            disableBuiltInState onPress={() => { updateCheckBox(2) }}
           />
-          <BouncyCheckbox
-            isChecked={checkboxState[3]["3"]}
-            text="Have a Walkthrough of Codebase"
-            disableBuiltInState
-            onPress={() => { updateCheckBox(3) }}
+          <BouncyCheckbox isChecked={checkboxState[3]["3"]} text="Have a Walkthrough of Codebase"
+            disableBuiltInState onPress={() => { updateCheckBox(3) }}
           />
-          <TouchableOpacity
-            style={[styles.ButtonStyle]}
-            onPress={() => {
-              navigation.navigate("Current Quarter");
-            }}
-          >
-            <View style={styles.ButtonTextViewStyle}>
-              <Icon
-                name="add"
-                color="#ffffff"
-                iconStyle={{ marginRight: 10 }}
-              />
-              <Text style={styles.ButtonTextStyle}>New Task</Text>
-            </View>
+          <TouchableOpacity style={[styles.ButtonStyle]} onPress={() => {navigation.navigate("Current Quarter");}}>
+            <Icon name="add" color="#ffffff" iconStyle={{ marginRight: 10 }} />
+            <Text style={styles.ButtonTextStyle}>New Task</Text>
           </TouchableOpacity>
         </Card>
         <Card>
@@ -80,20 +57,9 @@ const CurrentQuarter = ({ navigation }) => {
               Won 5th Position in Go-MMT Hackathon
             </Text>
           </Unorderedlist>
-          <TouchableOpacity
-            style={[styles.ButtonStyle]}
-            onPress={() => {
-              navigation.navigate("Current Quarter");
-            }}
-          >
-            <View style={styles.ButtonTextViewStyle}>
-              <Icon
-                name="add"
-                color="#ffffff"
-                iconStyle={{ marginRight: 10 }}
-              />
-              <Text style={styles.ButtonTextStyle}>New Award</Text>
-            </View>
+          <TouchableOpacity style={[styles.ButtonStyle]} onPress={() => {navigation.navigate("Current Quarter");}}>
+            <Icon name="add" color="#ffffff" iconStyle={{ marginRight: 10 }} />
+            <Text style={styles.ButtonTextStyle}>New Award</Text>
           </TouchableOpacity>
         </Card>
         <Card>
@@ -109,20 +75,9 @@ const CurrentQuarter = ({ navigation }) => {
               Take part in Cricket Tournament
             </Text>
           </Unorderedlist>
-          <TouchableOpacity
-            style={[styles.ButtonStyle]}
-            onPress={() => {
-              navigation.navigate("Current Quarter");
-            }}
-          >
-            <View style={styles.ButtonTextViewStyle}>
-              <Icon
-                name="add"
-                color="#ffffff"
-                iconStyle={{ marginRight: 10 }}
-              />
-              <Text style={styles.ButtonTextStyle}>New Activity</Text>
-            </View>
+          <TouchableOpacity style={[styles.ButtonStyle]} onPress={() => { navigation.navigate("Current Quarter");}}>
+            <Icon name="add" color="#ffffff" iconStyle={{ marginRight: 10 }} />
+            <Text style={styles.ButtonTextStyle}>New Activity</Text>
           </TouchableOpacity>
         </Card>
       </ScrollView>
