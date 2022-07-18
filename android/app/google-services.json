@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "1079049916295",
+    "firebase_url": "https://goworklog-2a7ff-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "goworklog-2a7ff",
     "storage_bucket": "goworklog-2a7ff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1079049916295:android:b5ec9382fca30a54bb0d22",
+        "mobilesdk_app_id": "1:1079049916295:android:5e93d20af65ae5d9bb0d22",
         "android_client_info": {
-          "package_name": "com.makemytrip.goworklog"
+          "package_name": "com.goworklog"
         }
       },
       "oauth_client": [
