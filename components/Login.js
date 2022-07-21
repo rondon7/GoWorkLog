@@ -2,11 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
-// import firestore from '@react-native-firebase/firestore';
-// const db = firestore();
-// const usersCollection = db.collection('Users');
-// const quartersCollection = db.collection('Quarters');
-// const userQuartersMappingCollection = db.collection('UserQuarterMapping');
+
 const Login = ({route, navigation}) => {
   console.log(route);
   const [currentQuarterData, setCurrentQuarterData] = useState('Q22022');

@@ -99,6 +99,11 @@ const Dashboard = ({route, navigation}) => {
   );
 };
 
+// Dashboard.navigationOptions = () => ({
+//   title: 'Your Dashboard',
+//   headerLeft: () => null,
+// });
+
 const styles = StyleSheet.create({
   header: {
     alignSelf: 'stretch',
@@ -133,10 +138,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'cornflowerblue',
   },
   PreviousButtonStyle: {
-    backgroundColor: 'forestgreen',
+    backgroundColor: 'darkturquoise',
   },
   NewButtonStyle: {
-    backgroundColor: 'red',
+    backgroundColor: 'deepskyblue',
     color: 'white',
   },
   ButtonTextViewStyle: {
