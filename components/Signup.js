@@ -5,7 +5,7 @@ import {Alert} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 const db = firestore();
 const usersCollection = db.collection('Users');
-
+const currentQuarter = 'Q12022';
 const Signup = ({navigation}) => {
   const [userDetails, setUserDetails] = useState({
     displayName: '',
@@ -30,20 +30,33 @@ const Signup = ({navigation}) => {
           res.user.updateProfile({
             displayName: userDetails.displayName[0],
           });
-          console.log('User registered successfully!');
-          usersCollection.add({
-            Email: userDetails.email[0],
-            Passowrd: userDetails.password[0],
-            Username: userDetails.displayName[0],
-          });
-          setUserDetails({
-            displayName: '',
-            email: '',
-            password: '',
-          });
-          navigation.navigate('DashboardOptions');
+          console.log(
+            'User ',
+            userDetails.displayName[0],
+            ' registered successfully!',
+          );
+          const tempUsername = userDetails.displayName[0];
+          usersCollection
+            .doc(userDetails.displayName[0])
+            .set({
+              Email: userDetails.email[0],
+              Password: userDetails.password[0],
+              Username: userDetails.displayName[0],
+            })
+            .then(() => {
+              setUserDetails({
+                displayName: '',
+                email: '',
+                password: '',
+              });
+              navigation.navigate('Dashboard', {
+                username: tempUsername,
+                currentQuarter: currentQuarter,
+                fromSignUp: true,
+              });
+            });
         })
-        .catch(error => Alert.alert(error.message));
+        .catch(error => console.log(error));
     }
   };
 
@@ -51,7 +64,7 @@ const Signup = ({navigation}) => {
     <View style={styles.container}>
       <TextInput
         style={styles.inputStyle}
-        placeholder="Name"
+        placeholder="Username"
         value={userDetails.displayName}
         onChangeText={val => updateInputVal(val, 'displayName')}
       />

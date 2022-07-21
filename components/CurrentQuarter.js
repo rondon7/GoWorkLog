@@ -6,119 +6,243 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Card} from '@rneui/themed';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Unorderedlist from 'react-native-unordered-list';
+import {v4 as uuidv4} from 'uuid';
 
-const CurrentQuarter = ({navigation}) => {
-  const initialState = [];
-  for (let i = 0; i < 10; ++i) {
-    const tempKey = '' + i;
-    let tempObj = {[tempKey]: false};
-    initialState.push(tempObj);
-  }
-  const [checkboxState, setCheckboxState] = useState(initialState);
-  const updateCheckBox = idx => {
+import firestore from '@react-native-firebase/firestore';
+const db = firestore();
+const userQuartersMappingCollection = db.collection('UserQuarterMapping');
+const tasksCollection = db.collection('Tasks');
+const awardsCollection = db.collection('Awards');
+const activitiesCollection = db.collection('Activities');
+
+const CurrentQuarter = ({route, navigation}) => {
+  const [currentTasksData, setCurrentTasksData] = useState([]);
+  const [awardsData, setAwardsData] = useState([]);
+  const [activitiesData, setActivitiesData] = useState([]);
+  const [checkboxState, setCheckboxState] = useState([]);
+  useEffect(() => {
+    if (route) {
+      const userQuarterMappingDocRef = userQuartersMappingCollection.doc(
+        route.params.username + '' + route.params.currentQuarter,
+      );
+      tasksCollection
+        .where('UserQuarterMapping', '==', userQuarterMappingDocRef)
+        .get()
+        .then(querySnapshot => {
+          console.log(querySnapshot);
+          querySnapshot.forEach(doc => {
+            setCurrentTasksData(oldArray => [
+              ...oldArray,
+              {
+                docId: doc.id,
+                isFinished: doc.data().isFinished,
+                Title: doc.data().Title,
+              },
+            ]);
+          });
+        });
+      awardsCollection
+        .where('UserQuarterMapping', '==', userQuarterMappingDocRef)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            setAwardsData(oldArray => [
+              ...oldArray,
+              {
+                docId: doc.id,
+                Title: doc.data().Title,
+              },
+            ]);
+          });
+        });
+      activitiesCollection
+        .where('UserQuarterMapping', '==', userQuarterMappingDocRef)
+        .get()
+        .then(querySnapshot => {
+          querySnapshot.forEach(doc => {
+            setActivitiesData(oldArray => [
+              ...oldArray,
+              {
+                docId: doc.id,
+                Title: doc.data().Title,
+              },
+            ]);
+          });
+        });
+    }
+  }, [route]);
+
+  useEffect(() => {
+    let size = 0;
+    if (route) {
+      const userQuarterMappingDocRef = userQuartersMappingCollection.doc(
+        route.params.username + '' + route.params.currentQuarter,
+      );
+      tasksCollection
+        .where('UserQuarterMapping', '==', userQuarterMappingDocRef)
+        .get()
+        .then(snap => {
+          size = snap.size;
+          console.log(size);
+          if (currentTasksData.length > 0) {
+            let tempState = [];
+            console.log(currentTasksData);
+            if (currentTasksData.length === size) {
+              console.log('inside checkboxstate');
+              currentTasksData.forEach(x => {
+                tasksCollection
+                  .doc(x.docId)
+                  .get()
+                  .then(doc => {
+                    let tempObj = {[x.docId]: doc.data().isFinished};
+                    tempState.push(tempObj);
+                    setCheckboxState(oldArray => [...oldArray, tempObj]);
+                  });
+              });
+            }
+          }
+        });
+    }
+  }, [currentTasksData, route]);
+
+  const updateCheckBox = (idx, x) => {
     let temp_state = [...checkboxState];
     let temp_element = {...temp_state[idx]};
-    const tempKey = '' + idx;
-    temp_element = {[tempKey]: !temp_element[idx]};
+    const tempKey = '' + x.docId;
+    temp_element = {[tempKey]: !temp_element[x.docId]};
     temp_state[idx] = temp_element;
     setCheckboxState(temp_state);
+    currentTasksData.forEach(x1 => {
+      if (x1.docId === x.docId) {
+        x1.isFinished = !x1.isFinished;
+        tasksCollection.doc(x.docId).update({isFinished: x1.isFinished});
+      }
+    });
   };
+
+  const RenderCheckbox = () => {
+    if (
+      currentTasksData.length > 0 &&
+      checkboxState.length > 0 &&
+      currentTasksData.length === checkboxState.length
+    ) {
+      return currentTasksData.map(x => {
+        let idx = x.docId.length - 1;
+        for (let i = x.docId.length - 1; i >= 0; --i) {
+          if (x.docId.charAt(i) === 'n') {
+            idx = i;
+            break;
+          }
+        }
+        let slicedString = x.docId.slice(idx + 1);
+        let tempidx = parseInt(slicedString, 10);
+        return (
+          <BouncyCheckbox
+            isChecked={checkboxState[tempidx - 1][x.docId]}
+            key={uuidv4()}
+            text={x.Title}
+            disableBuiltInState
+            onPress={() => {
+              updateCheckBox(tempidx - 1, x);
+            }}
+            style={styles.CheckBoxStyle}
+          />
+        );
+      });
+    } else {
+      return <></>;
+    }
+  };
+
+  const RenderAwards = () => {
+    if (awardsData.length > 0) {
+      console.log(awardsData);
+      return awardsData.map(x => {
+        return (
+          <Unorderedlist
+            style={styles.CheckBoxStyle}
+            key={uuidv4()}
+            bulletUnicode={0x29be}
+            color="red">
+            <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
+          </Unorderedlist>
+        );
+      });
+    } else {
+      return <></>;
+    }
+  };
+
+  const RenderActivities = () => {
+    if (activitiesData.length > 0) {
+      console.log(activitiesData);
+      return activitiesData.map(x => {
+        return (
+          <Unorderedlist
+            style={styles.CheckBoxStyle}
+            key={uuidv4()}
+            bulletUnicode={0x2765}
+            color="dodgerblue">
+            <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
+          </Unorderedlist>
+        );
+      });
+    } else {
+      return <></>;
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Card>
-          <Card.Title>Tasks To-Be-Done/Done</Card.Title>
+          <Card.Title>Tasks Done/To-Be-Done</Card.Title>
           <Card.Divider />
-          <BouncyCheckbox
-            isChecked={checkboxState[0]['0']}
-            text="Complete React Native Demo Assignment"
-            disableBuiltInState
-            onPress={() => {
-              updateCheckBox(0);
-            }}
-            style={styles.CheckBoxStyle}
-          />
-          <BouncyCheckbox
-            isChecked={checkboxState[1]['1']}
-            text="Complete Company-sponsored Training"
-            disableBuiltInState
-            onPress={() => {
-              updateCheckBox(1);
-            }}
-            style={styles.CheckBoxStyle}
-          />
-          <BouncyCheckbox
-            isChecked={checkboxState[2]['2']}
-            text="Complete Code Setup in Local Machine"
-            disableBuiltInState
-            onPress={() => {
-              updateCheckBox(2);
-            }}
-            style={styles.CheckBoxStyle}
-          />
-          <BouncyCheckbox
-            isChecked={checkboxState[3]['3']}
-            text="Have a Walkthrough of Codebase"
-            disableBuiltInState
-            onPress={() => {
-              updateCheckBox(3);
-            }}
-            style={styles.CheckBoxStyle}
-          />
+          {RenderCheckbox()}
           <TouchableOpacity
             style={[styles.ButtonStyle]}
             onPress={() => {
-              navigation.navigate('Current Quarter');
+              navigation.navigate('Add new Data', {
+                username: route.params.username,
+                currentQuarter: route.params.currentQuarter,
+                dataSet: 'Tasks',
+              });
             }}>
-            {/* <Icon name="add" color="#ffffff" iconStyle={{marginRight: 10}} /> */}
             <Text style={styles.ButtonTextStyle}>+</Text>
           </TouchableOpacity>
         </Card>
         <Card>
           <Card.Title>Awards Won</Card.Title>
           <Card.Divider />
-          <Unorderedlist
-            style={styles.CheckBoxStyle}
-            bulletUnicode={0x29be}
-            color="red">
-            <Text style={StyleSheet.awardsTextStyle}>
-              Won 5th Position in Go-MMT Hackathon
-            </Text>
-          </Unorderedlist>
+          {RenderAwards()}
           <TouchableOpacity
             style={[styles.ButtonStyle]}
             onPress={() => {
-              navigation.navigate('Current Quarter');
+              navigation.navigate('Add new Data', {
+                username: route.params.username,
+                currentQuarter: 'Q12022',
+                dataSet: 'Awards',
+              });
             }}>
-            {/* <Icon name="add" color="#ffffff" iconStyle={{marginRight: 10}} /> */}
             <Text style={styles.ButtonTextStyle}>+</Text>
           </TouchableOpacity>
         </Card>
         <Card>
           <Card.Title>Extra-Cirricular Activities Done</Card.Title>
           <Card.Divider />
-          <Unorderedlist
-            style={styles.CheckBoxStyle}
-            bulletUnicode={0x2765}
-            color="dodgerblue">
-            <Text style={StyleSheet.awardsTextStyle}>
-              Went on the Team Trip to Jaladhama
-            </Text>
-          </Unorderedlist>
-          <Unorderedlist bulletUnicode={0x2765} color="dodgerblue">
-            <Text style={StyleSheet.awardsTextStyle}>
-              Take part in Cricket Tournament
-            </Text>
-          </Unorderedlist>
+          {RenderActivities()}
           <TouchableOpacity
             style={[styles.ButtonStyle]}
             onPress={() => {
-              navigation.navigate('Current Quarter');
+              navigation.navigate('Add new Data', {
+                username: route.params.username,
+                currentQuarter: 'Q12022',
+                dataSet: 'Activities',
+              });
             }}>
-            {/* <Icon name="add" color="#ffffff" iconStyle={{marginRight: 10}} /> */}
             <Text style={styles.ButtonTextStyle}>+</Text>
           </TouchableOpacity>
         </Card>

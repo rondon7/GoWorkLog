@@ -1,20 +1,41 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
-
-const Login = ({navigation}) => {
+// import firestore from '@react-native-firebase/firestore';
+// const db = firestore();
+// const usersCollection = db.collection('Users');
+// const quartersCollection = db.collection('Quarters');
+// const userQuartersMappingCollection = db.collection('UserQuarterMapping');
+const Login = ({route, navigation}) => {
+  console.log(route);
+  const [currentQuarterData, setCurrentQuarterData] = useState('Q22022');
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+    if (route) {
+      if (route.params) {
+        console.log('qwerty', route.params);
+        setUserDetails({
+          email: [route.params.email],
+          password: [route.params.password],
+        }).then(() => {
+          setCurrentQuarterData(route.params.currentQuarter);
+          userLogin();
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route]);
 
   const updateInputVal = (val, prop) => {
     setUserDetails({...userDetails, [prop]: [val]});
   };
 
   const userLogin = () => {
-    console.log(userDetails, userDetails.email[0], userDetails.password[0]);
     if (userDetails.email[0] === '' || userDetails.password[0] === '') {
       Alert.alert('Enter details to Sign In!');
     } else {
@@ -24,15 +45,17 @@ const Login = ({navigation}) => {
           userDetails.password[0],
         )
         .then(res => {
-          console.log(res);
-          console.log('User logged-in successfully!');
           setUserDetails({
             email: '',
             password: '',
           });
-          navigation.navigate('DashboardOptions');
+          navigation.navigate('Dashboard', {
+            username: res.user.displayName,
+            currentQuarter: currentQuarterData,
+            fromSignUp: false,
+          });
         })
-        .catch(error => Alert.alert(error.message));
+        .catch(error => console.log(error));
     }
   };
 
