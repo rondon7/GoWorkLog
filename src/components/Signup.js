@@ -1,12 +1,19 @@
-import React, {useState} from 'react';
+import React, {useState, useLayoutEffect} from 'react';
 import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Alert} from 'react-native';
+import { Alert } from 'react-native';
+
+import getCurrentQuarter from '../../helpers/getCurrentQuarter';
+const currentYear = getCurrentQuarter().Year;
+const currentQuarterNo = getCurrentQuarter().Quarter;
+
 import firestore from '@react-native-firebase/firestore';
 const db = firestore();
 const usersCollection = db.collection('Users');
-const currentQuarter = 'Q12022';
-const Signup = ({navigation}) => {
+const quartersCollection = db.collection('Quarters');
+
+const Signup = ({ navigation }) => {
+
   const [userDetails, setUserDetails] = useState({
     displayName: '',
     email: '',
@@ -27,21 +34,21 @@ const Signup = ({navigation}) => {
           userDetails.password[0],
         )
         .then(res => {
-          res.user.updateProfile({
-            displayName: userDetails.displayName[0],
-          });
+          const UID = res.user.uid;
+          console.log(UID);
           console.log(
             'User ',
             userDetails.displayName[0],
             ' registered successfully!',
           );
-          const tempUsername = userDetails.displayName[0];
+          const quarterDocRef = quartersCollection.doc(currentYear + 'Q' + currentQuarterNo);
           usersCollection
-            .doc(userDetails.displayName[0])
+            .doc(UID + '')
             .set({
               Email: userDetails.email[0],
               Password: userDetails.password[0],
               Username: userDetails.displayName[0],
+              InitialActiveQuarter: quarterDocRef,
             })
             .then(() => {
               setUserDetails({
@@ -49,12 +56,11 @@ const Signup = ({navigation}) => {
                 email: '',
                 password: '',
               });
-              navigation.navigate('Dashboard', {
-                username: tempUsername,
-                currentQuarter: currentQuarter,
-                fromSignUp: true,
+              navigation.navigate('dashboard', {
+                userUid : UID,
               });
-            });
+            })
+            .catch(error => console.log(error));
         })
         .catch(error => console.log(error));
     }
@@ -88,7 +94,7 @@ const Signup = ({navigation}) => {
       />
       <Text
         style={styles.loginText}
-        onPress={() => navigation.navigate('Login')}>
+        onPress={() => navigation.navigate('login')}>
         Already Registered? Click here to login
       </Text>
     </View>

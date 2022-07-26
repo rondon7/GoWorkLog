@@ -3,29 +3,12 @@ import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
 
-const Login = ({route, navigation}) => {
-  console.log(route);
-  const [currentQuarterData, setCurrentQuarterData] = useState('Q22022');
+const Login = ({ route, navigation }) => {
+  
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
-
-  useEffect(() => {
-    if (route) {
-      if (route.params) {
-        console.log('qwerty', route.params);
-        setUserDetails({
-          email: [route.params.email],
-          password: [route.params.password],
-        }).then(() => {
-          setCurrentQuarterData(route.params.currentQuarter);
-          userLogin();
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route]);
 
   const updateInputVal = (val, prop) => {
     setUserDetails({...userDetails, [prop]: [val]});
@@ -41,14 +24,13 @@ const Login = ({route, navigation}) => {
           userDetails.password[0],
         )
         .then(res => {
+          const UID = res.user.uid;
           setUserDetails({
             email: '',
             password: '',
           });
-          navigation.navigate('Dashboard', {
-            username: res.user.displayName,
-            currentQuarter: currentQuarterData,
-            fromSignUp: false,
+          navigation.navigate('dashboard', {
+            userUid: UID,
           });
         })
         .catch(error => console.log(error));
@@ -77,7 +59,7 @@ const Login = ({route, navigation}) => {
       />
       <Text
         style={styles.loginText}
-        onPress={() => navigation.navigate('Signup')}>
+        onPress={() => navigation.navigate('signup')}>
         Don't have account? Click here to signup
       </Text>
     </View>
