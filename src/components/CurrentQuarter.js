@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Card} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import { Card, Divider } from '@rneui/themed';
+import React, { useEffect, useState } from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import Unorderedlist from 'react-native-unordered-list';
 import Header from './Header';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import DeleteIcon from 'react-native-vector-icons/AntDesign';
 
 import getCurrentQuarter from '../../helpers/getCurrentQuarter';
 const currentYear = getCurrentQuarter().Year;
@@ -22,7 +24,7 @@ const usersCollection = db.collection('Users');
 const quartersCollection = db.collection('Quarters');
 
 const CurrentQuarter = ({ route, navigation }) => {
-  
+
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState([]);
   const [checkboxData, setCheckboxData] = useState([]);
@@ -33,8 +35,8 @@ const CurrentQuarter = ({ route, navigation }) => {
       console.log('UID', UID);
       const userDocRef = usersCollection.doc(UID)
       userDocRef.get().then(doc => {
-          setUserName(doc.data().Username);
-      });        
+        setUserName(doc.data().Username);
+      });
       const quarterDocRef = quartersCollection.doc(currentYear + 'Q' + currentQuarterNo);
       db.collection("Users/" + UID + "/UserData")
         .where('Quarter', '==', quarterDocRef)
@@ -52,7 +54,7 @@ const CurrentQuarter = ({ route, navigation }) => {
               },
             ]);
           });
-      });
+        });
     }
   }, [route]);
 
@@ -63,31 +65,31 @@ const CurrentQuarter = ({ route, navigation }) => {
       const quarterDocRef = quartersCollection.doc(currentYear + 'Q' + currentQuarterNo);
       db.collection("Users/" + UID + "/UserData")
         .where('Quarter', '==', quarterDocRef).get().then(querySnapshot => {
-        size = querySnapshot.size;
-        // console.log('Size', size);
-        // console.log('Userdata', userData);
-        // console.log('userData length', userData.length)
-        if (userData.length === size) {
-          // console.log('inside checkbox initialization function');
-          querySnapshot.forEach(doc1 => {
-            // console.log("Task doc", doc1);
-            if (doc1.data().isFinished == true || doc1.data().isFinished == false) {
-              let tempObj = { [doc1.id]: doc1.data().isFinished };
-              // console.log("Checkbox New Obj", tempObj);
-              setCheckboxData(oldArray => [...oldArray, tempObj]);
-            }
-          });  
-        }
-      });
+          size = querySnapshot.size;
+          // console.log('Size', size);
+          // console.log('Userdata', userData);
+          // console.log('userData length', userData.length)
+          if (userData.length === size) {
+            // console.log('inside checkbox initialization function');
+            querySnapshot.forEach(doc1 => {
+              // console.log("Task doc", doc1);
+              if (doc1.data().isFinished == true || doc1.data().isFinished == false) {
+                let tempObj = { [doc1.id]: doc1.data().isFinished };
+                // console.log("Checkbox New Obj", tempObj);
+                setCheckboxData(oldArray => [...oldArray, tempObj]);
+              }
+            });
+          }
+        });
     }
   }, [userData]);
 
   const updateCheckBox = (idx, x) => {
     const UID = route.params.userUid + '';
     let temp_state = [...checkboxData];
-    let temp_element = {...temp_state[idx]};
+    let temp_element = { ...temp_state[idx] };
     const tempKey = '' + x.docId;
-    temp_element = {[tempKey]: !temp_element[x.docId]};
+    temp_element = { [tempKey]: !temp_element[x.docId] };
     temp_state[idx] = temp_element;
     setCheckboxData(temp_state);
     userData.forEach(x1 => {
@@ -112,7 +114,8 @@ const CurrentQuarter = ({ route, navigation }) => {
     })
     console.log('Task array size', tempSize);
     if (userData.length > 0 && checkboxData.length > 0 && checkboxData.length === tempSize) {
-      return userData.map(x => { 
+      const UID = route.params.userUid + '';
+      return userData.map(x => {
         const dataQuarter = x.Quarter._documentPath._parts[1];
         const slicedYear = dataQuarter.slice(0, 4) + '';
         const slicedQuarterNo = dataQuarter.charAt(5) + '';
@@ -130,15 +133,43 @@ const CurrentQuarter = ({ route, navigation }) => {
           console.log("Array Idx: ", arrayIdx);
           if (arrayIdx != -1) {
             return (
-              <BouncyCheckbox
-                isChecked={checkboxData[arrayIdx][x.docId]}
-                text={x.Title}
-                disableBuiltInState
-                onPress={() => {
-                  updateCheckBox(arrayIdx, x);
-                }}
-                style={styles.CheckBoxStyle}
-              />
+              <View style={{ marginBottom: 15 }}>
+                <BouncyCheckbox
+                  isChecked={checkboxData[arrayIdx][x.docId]}
+                  text={x.Title}
+                  disableBuiltInState
+                  onPress={() => {
+                    updateCheckBox(arrayIdx, x);
+                  }}
+                  style={styles.CheckBoxStyle}
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
+                  <Icon style={{ marginLeft: 20 }} name="edit" size={20} color="#900" onPress={() => {
+                    navigation.navigate('addNewData', {
+                      userUid: UID,
+                      dataSet: 'Task',
+                      updation: true,
+                      prevValue: x.Title,
+                      prevId: x.docId,
+                    });
+                  }} />
+                  <DeleteIcon style={{ marginLeft: 20 }} name="delete" size={20} color="#900" onPress={() => {
+                    db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
+                      navigation.navigate('dashboard', {
+                        userUid: UID,
+                      });
+                    })
+                  }} />
+                  {/* <Text onPress={() => {
+                    db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
+                      navigation.navigate('dashboard', {
+                        userUid: UID,
+                      });
+                    })
+                  }}>X</Text> */}
+                </View>
+                <View style={{ padding: 0.2, backgroundColor: 'black' }}></View>
+              </View>
             );
           }
         }
@@ -151,18 +182,39 @@ const CurrentQuarter = ({ route, navigation }) => {
   const RenderAwards = () => {
     if (userData.length > 0) {
       // console.log('Userdata in Awards func.', userData);
+      const UID = route.params.userUid + '';
       return userData.map(x => {
         const dataQuarter = x.Quarter._documentPath._parts[1];
         const slicedYear = dataQuarter.slice(0, 4) + '';
         const slicedQuarterNo = dataQuarter.charAt(5) + '';
         if (slicedYear == currentYear && slicedQuarterNo == currentQuarterNo) {
           return ((!x.isFinished && x.Type === 'Award') &&
-            <Unorderedlist
-              style={styles.CheckBoxStyle}
-              bulletUnicode={0x29be}
-              color="red">
-              <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
-            </Unorderedlist>
+            <View>
+              <Unorderedlist
+                style={styles.CheckBoxStyle}
+                bulletUnicode={0x29be}
+                color="red">
+                <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
+              </Unorderedlist>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                <Icon style={{ marginLeft: 20 }} name="edit" size={20} color="#900" onPress={() => {
+                  navigation.navigate('addNewData', {
+                    userUid: UID,
+                    dataSet: 'Activity',
+                    updation: true,
+                    prevValue: x.Title,
+                    prevId: x.docId,
+                  });
+                }} />
+                <Text onPress={() => {
+                  db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
+                    navigation.navigate('dashboard', {
+                      userUid: UID,
+                    });
+                  })
+                }}>X</Text>
+              </View>
+            </View>
           );
         }
       });
@@ -174,18 +226,39 @@ const CurrentQuarter = ({ route, navigation }) => {
   const RenderActivities = () => {
     if (userData.length > 0) {
       // console.log('Userdata in Activities func.', userData);
+      const UID = route.params.userUid + '';
       return userData.map(x => {
         const dataQuarter = x.Quarter._documentPath._parts[1];
         const slicedYear = dataQuarter.slice(0, 4) + '';
         const slicedQuarterNo = dataQuarter.charAt(5) + '';
         if (slicedYear == currentYear && slicedQuarterNo == currentQuarterNo) {
           return ((!x.isFinished && x.Type === 'Activity') &&
-            <Unorderedlist
-              style={styles.CheckBoxStyle}
-              bulletUnicode={0x2765}
-              color="dodgerblue">
-              <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
-            </Unorderedlist>
+            <View>
+              <Unorderedlist
+                style={styles.CheckBoxStyle}
+                bulletUnicode={0x2765}
+                color="dodgerblue">
+                <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
+              </Unorderedlist>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                <Icon style={{ marginLeft: 20 }} name="edit" size={20} color="#900" onPress={() => {
+                  navigation.navigate('addNewData', {
+                    userUid: UID,
+                    dataSet: 'Activity',
+                    updation: true,
+                    prevValue: x.Title,
+                    prevId: x.docId,
+                  });
+                }} />
+                <Text onPress={() => {
+                  db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
+                    navigation.navigate('dashboard', {
+                      userUid: UID,
+                    });
+                  })
+                }}>X</Text>
+              </View>
+            </View>
           );
         }
       });
@@ -223,6 +296,7 @@ const CurrentQuarter = ({ route, navigation }) => {
               navigation.navigate('addNewData', {
                 userUid: route.params.userUid,
                 dataSet: 'Award',
+                updation: false,
               });
             }}>
             <Text style={styles.ButtonTextStyle}>+</Text>
@@ -281,6 +355,7 @@ const styles = StyleSheet.create({
   },
   CheckBoxStyle: {
     marginBottom: 4,
+    paddingRight: 15,
   },
 });
 

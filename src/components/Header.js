@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         height: 52,
         flexDirection: 'row',
-        backgroundColor: 'aqua',
+        backgroundColor: 'darkturquoise',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingRight: 10,

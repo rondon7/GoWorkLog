@@ -45,8 +45,6 @@ const Signup = ({ navigation }) => {
           usersCollection
             .doc(UID + '')
             .set({
-              Email: userDetails.email[0],
-              Password: userDetails.password[0],
               Username: userDetails.displayName[0],
               InitialActiveQuarter: quarterDocRef,
             })

@@ -73,6 +73,7 @@ const PreviousQuarters = ({ route, navigation }) => {
       return previousQuartersTitles.map(x => {
         return (
           <TouchableOpacity
+            style={styles.cardStyle}
             onPress={() => {
               navigation.navigate('quarterDetails', {
                 userUid: route.params.userUid,
@@ -80,10 +81,8 @@ const PreviousQuarters = ({ route, navigation }) => {
                 year: x.year,
               });
             }}>
-            <Card>
-              <Card.Title style={styles.cardTitleStyle}>{x.cardTitle}</Card.Title>
-              <Card.Divider />
-            </Card>
+            <Card.Title style={styles.cardTitleStyle}>{x.cardTitle}</Card.Title>
+            <Card.Divider />
           </TouchableOpacity>
         );
       });
@@ -115,6 +114,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+  },
+  cardStyle: {
+    marginTop: 25,
+    borderRadius: 10,
+    padding: 15,
+    elevation: 5,
+    shadowColor: 'black',
   },
   cardTitleStyle: {
     fontSize: 25,

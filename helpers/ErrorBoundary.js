@@ -28,7 +28,7 @@ class ErrorBoundary extends React.Component {
                     backgroundColor: 'blue'
                 }}>
                     <Text style={{ color: 'white', fontSize: 40 }}>
-                        Opps!! Something went wrong!
+                        Ooops!! Something went wrong!
                     </Text>
                 </View>
             );

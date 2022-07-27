@@ -3,7 +3,7 @@ import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {Alert} from 'react-native';
 
-const Login = ({ route, navigation }) => {
+const Login = ({ navigation }) => {
   
   const [userDetails, setUserDetails] = useState({
     email: '',

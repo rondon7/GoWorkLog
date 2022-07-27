@@ -46,7 +46,7 @@ const Dashboard = ({ route, navigation }) => {
           <Text style={styles.ButtonTextStyle}>Your Previous Quarters</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[styles.ButtonStyle, styles.NewButtonStyle]}
         onPress={() => {
           navigation.navigate('addNewQuarter', {
@@ -56,7 +56,7 @@ const Dashboard = ({ route, navigation }) => {
         <View style={styles.ButtonTextViewStyle}>
           <Text style={styles.ButtonTextStyle}>Start a New Quarter</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
     alignItems: 'center',
-    padding: 10,
+    paddingTop: 50,
     alignContent: 'center',
     borderRadius: 18,
   },

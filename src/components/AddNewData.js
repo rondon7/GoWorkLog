@@ -4,6 +4,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {Alert} from 'react-native';
@@ -21,6 +22,7 @@ const quartersCollection = db.collection('Quarters');
 const AddNewData = ({ route, navigation }) => {
   
   const [userName, setUserName] = useState('');
+  const [dataValue, setDataValue] = useState('');
 
   useEffect(() => {
     if (route && route.params.userUid) {
@@ -29,11 +31,10 @@ const AddNewData = ({ route, navigation }) => {
         .get()
         .then(doc => {
           setUserName(doc.data().Username);
+          setDataValue(route.params.prevValue);
         });
     }
   }, [route]);
-
-  const [dataValue, setDataValue] = useState('');
 
   const updateInputVal = val => {
     setDataValue(val);
@@ -45,33 +46,42 @@ const AddNewData = ({ route, navigation }) => {
     } else {
       if (route && route.params.userUid) {
         const UID = route.params.userUid;
-        const quarterDocId = currentYear + 'Q' + currentQuarterNo;
-        if (route.params.dataSet == 'Task') {
-          quartersCollection.doc(quarterDocId).get().then(doc => {
-            db.collection("Users/" + UID + "/UserData").doc().set({
-              Title: dataValue,
-              Quarter: doc.ref,
-              isFinished: false,
-            }).then(() => {
-              setDataValue('');
-              navigation.navigate('dashboard', {
-                userUid: route.params.userUid,
-              });
-            })
+        if (route.params.updation == true) {
+          console.log("Prev Id", route.params.prevId);
+          db.collection("Users/" + UID + "/UserData").doc(route.params.prevId).update({ Title: dataValue }).then(() => {
+            navigation.navigate('dashboard', {
+              userUid: route.params.userUid,
+            });
           })
         } else {
-          quartersCollection.doc(quarterDocId).get().then(doc => {
-            db.collection("Users/" + UID + "/UserData").doc().set({
-              Title: dataValue,
-              Quarter: doc.ref,
-              Type: (route.params.dataSet + ''),
-            }).then(() => {
-              setDataValue('');
-              navigation.navigate('dashboard', {
-                userUid: route.params.userUid,
-              });
+          const quarterDocId = currentYear + 'Q' + currentQuarterNo;
+          if (route.params.dataSet == 'Task') {
+            quartersCollection.doc(quarterDocId).get().then(doc => {
+              db.collection("Users/" + UID + "/UserData").doc().set({
+                Title: dataValue,
+                Quarter: doc.ref,
+                isFinished: false,
+              }).then(() => {
+                setDataValue('');
+                navigation.navigate('dashboard', {
+                  userUid: route.params.userUid,
+                });
+              })
             })
-          })
+          } else {
+            quartersCollection.doc(quarterDocId).get().then(doc => {
+              db.collection("Users/" + UID + "/UserData").doc().set({
+                Title: dataValue,
+                Quarter: doc.ref,
+                Type: (route.params.dataSet + ''),
+              }).then(() => {
+                setDataValue('');
+                navigation.navigate('dashboard', {
+                  userUid: route.params.userUid,
+                });
+              })
+            })
+          }
         }
       }
     }
@@ -80,15 +90,33 @@ const AddNewData = ({ route, navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <Header userName={userName} navigation={navigation} />
-      <Text style={styles.headingStyle}>Add New {route.params.dataSet}</Text>
-      <TextInput
-        style={styles.inputStyle}
-        placeholder="Type your text here"
-        multiline={true}
-        underlineColorAndroid='transparent'
-        value={dataValue}
-        onChangeText={val => updateInputVal(val)}
-      />
+      {!route.params.updation && (
+        <View>
+          <Text style={styles.headingStyle}>
+            Add New {route.params.dataSet}
+          </Text>
+          <TextInput
+            style={styles.inputStyle}
+            placeholder="Type your text here"
+            multiline={true}
+            underlineColorAndroid='transparent'
+            value={dataValue}
+            onChangeText={val => updateInputVal(val)}
+          />
+        </View>)}
+      {route.params.updation && (
+        <View>
+          <Text style={styles.headingStyle}>
+            Update {route.params.dataSet}
+          </Text>
+          <TextInput
+            style={styles.inputStyle}
+            multiline={true}
+            underlineColorAndroid='transparent'
+            value={dataValue}
+            onChangeText={val => updateInputVal(val)}
+          />
+        </View>)}
       <TouchableOpacity
         style={styles.submitButtonStyle}
         onPress={() => handleSubmitButton(route)}>
