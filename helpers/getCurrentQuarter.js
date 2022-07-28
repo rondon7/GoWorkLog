@@ -4,7 +4,7 @@ const getCurrentQuarter = () => {
     // console.log('Year', year)
     // let monthNo = (new Date().getMonth() + 1) + '';
     // console.log('Month No.', monthNo);
-    let quarterNo = '1';
+    let quarterNo = '3';
     // if (monthNo >= 1 && monthNo <= 3)
     //     quarterNo = '4';
     // else if (monthNo >= 4 && monthNo <= 6)

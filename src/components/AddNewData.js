@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {Alert} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import Header from './Header';
 
@@ -20,7 +20,7 @@ const usersCollection = db.collection('Users');
 const quartersCollection = db.collection('Quarters');
 
 const AddNewData = ({ route, navigation }) => {
-  
+
   const [userName, setUserName] = useState('');
   const [dataValue, setDataValue] = useState('');
 
@@ -49,7 +49,7 @@ const AddNewData = ({ route, navigation }) => {
         if (route.params.updation == true) {
           console.log("Prev Id", route.params.prevId);
           db.collection("Users/" + UID + "/UserData").doc(route.params.prevId).update({ Title: dataValue }).then(() => {
-            navigation.navigate('dashboard', {
+            navigation.navigate('currentQuarter', {
               userUid: route.params.userUid,
             });
           })
@@ -63,7 +63,7 @@ const AddNewData = ({ route, navigation }) => {
                 isFinished: false,
               }).then(() => {
                 setDataValue('');
-                navigation.navigate('dashboard', {
+                navigation.navigate('currentQuarter', {
                   userUid: route.params.userUid,
                 });
               })
@@ -76,7 +76,7 @@ const AddNewData = ({ route, navigation }) => {
                 Type: (route.params.dataSet + ''),
               }).then(() => {
                 setDataValue('');
-                navigation.navigate('dashboard', {
+                navigation.navigate('currentQuarter', {
                   userUid: route.params.userUid,
                 });
               })

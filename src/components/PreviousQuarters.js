@@ -21,7 +21,7 @@ const initialYear = '2022';
 const initialQuarterNo = '1';
 
 const PreviousQuarters = ({ route, navigation }) => {
-  
+
   const [previousQuartersTitles, setPreviousQuartersTitles] = useState([]);
   // const [previousQuartersData, setPreviousQuartersData] = useState([]);
   const [userName, setUserName] = useState('');
@@ -81,8 +81,7 @@ const PreviousQuarters = ({ route, navigation }) => {
                 year: x.year,
               });
             }}>
-            <Card.Title style={styles.cardTitleStyle}>{x.cardTitle}</Card.Title>
-            <Card.Divider />
+            <Text style={styles.cardTitleStyle}>{x.cardTitle}</Text>
           </TouchableOpacity>
         );
       });
@@ -118,12 +117,14 @@ const styles = StyleSheet.create({
   cardStyle: {
     marginTop: 25,
     borderRadius: 10,
+    backgroundColor: 'gainsboro',
     padding: 15,
-    elevation: 5,
-    shadowColor: 'black',
+    // elevation: 3,
+    // borderColor: 'black',
   },
   cardTitleStyle: {
     fontSize: 25,
+    color: 'black',
   },
 });
 

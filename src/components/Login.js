@@ -1,17 +1,31 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {Alert} from 'react-native';
+import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = ({ navigation }) => {
-  
+
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
 
+  // useEffect(() => {
+  //   const find = async () => {
+  //     let UID = await AsyncStorage.getItem('curUser');
+  //     console.log('UID', UID);
+  //     if (UID) {
+  //       navigation.navigate('dashboard', {
+  //         userUid: UID,
+  //       });
+  //     }
+  //   };
+  //   find();
+  // }, []);
+
   const updateInputVal = (val, prop) => {
-    setUserDetails({...userDetails, [prop]: [val]});
+    setUserDetails({ ...userDetails, [prop]: [val] });
   };
 
   const userLogin = () => {
@@ -25,6 +39,7 @@ const Login = ({ navigation }) => {
         )
         .then(res => {
           const UID = res.user.uid;
+          AsyncStorage.setItem('curUser', UID);
           setUserDetails({
             email: '',
             password: '',

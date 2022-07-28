@@ -31,6 +31,7 @@ const CurrentQuarter = ({ route, navigation }) => {
 
   useEffect(() => {
     if (route && route.params.userUid) {
+      setUserData([]);
       const UID = route.params.userUid + '';
       console.log('UID', UID);
       const userDocRef = usersCollection.doc(UID)
@@ -42,25 +43,25 @@ const CurrentQuarter = ({ route, navigation }) => {
         .where('Quarter', '==', quarterDocRef)
         .get()
         .then(querySnapshot => {
+          const tempArray = [];
           querySnapshot.forEach(doc1 => {
-            setUserData(oldArray => [
-              ...oldArray,
-              {
-                docId: doc1.id,
-                isFinished: doc1.data().isFinished,
-                Title: doc1.data().Title,
-                Type: doc1.data().Type,
-                Quarter: doc1.data().Quarter,
-              },
-            ]);
+            tempArray.push({
+              docId: doc1.id,
+              isFinished: doc1.data().isFinished,
+              Title: doc1.data().Title,
+              Type: doc1.data().Type,
+              Quarter: doc1.data().Quarter,
+            });
           });
+          console.log('UserData', userData, '---> Temp Array', tempArray);
+          setUserData(tempArray);
         });
     }
   }, [route]);
 
   useEffect(() => {
     let size = 0;
-    if (route && route.params.userUid) {
+    if (route && route.params.userUid && userData.length > 0) {
       const UID = route.params.userUid + '';
       const quarterDocRef = quartersCollection.doc(currentYear + 'Q' + currentQuarterNo);
       db.collection("Users/" + UID + "/UserData")
@@ -121,16 +122,16 @@ const CurrentQuarter = ({ route, navigation }) => {
         const slicedQuarterNo = dataQuarter.charAt(5) + '';
         if ((slicedYear == currentYear && slicedQuarterNo == currentQuarterNo)
           && (x.isFinished == true || x.isFinished == false)) {
-          console.log("X.DocId: ", x.docId);
+          // console.log("X.DocId: ", x.docId);
           let arrayIdx = 0;
           for (let resData of checkboxData) {
-            console.log(Object.keys(resData)[0]);
+            // console.log(Object.keys(resData)[0]);
             if (Object.keys(resData)[0] == x.docId)
               break;
             else
               arrayIdx++;
           }
-          console.log("Array Idx: ", arrayIdx);
+          // console.log("Array Idx: ", arrayIdx);
           if (arrayIdx != -1) {
             return (
               <View style={{ marginBottom: 15 }}>
@@ -160,13 +161,6 @@ const CurrentQuarter = ({ route, navigation }) => {
                       });
                     })
                   }} />
-                  {/* <Text onPress={() => {
-                    db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
-                      navigation.navigate('dashboard', {
-                        userUid: UID,
-                      });
-                    })
-                  }}>X</Text> */}
                 </View>
                 <View style={{ padding: 0.2, backgroundColor: 'black' }}></View>
               </View>
@@ -189,31 +183,32 @@ const CurrentQuarter = ({ route, navigation }) => {
         const slicedQuarterNo = dataQuarter.charAt(5) + '';
         if (slicedYear == currentYear && slicedQuarterNo == currentQuarterNo) {
           return ((!x.isFinished && x.Type === 'Award') &&
-            <View>
+            <View style={{ marginTop: 10 }}>
               <Unorderedlist
                 style={styles.CheckBoxStyle}
                 bulletUnicode={0x29be}
                 color="red">
                 <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
               </Unorderedlist>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <Icon style={{ marginLeft: 20 }} name="edit" size={20} color="#900" onPress={() => {
                   navigation.navigate('addNewData', {
                     userUid: UID,
-                    dataSet: 'Activity',
-                    updation: true,
+                    dataSet: 'Award',
+                    updation: false,
                     prevValue: x.Title,
                     prevId: x.docId,
                   });
                 }} />
-                <Text onPress={() => {
+                <DeleteIcon style={{ marginLeft: 20 }} name="delete" size={20} color="#900" onPress={() => {
                   db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
                     navigation.navigate('dashboard', {
                       userUid: UID,
                     });
                   })
-                }}>X</Text>
+                }} />
               </View>
+              <View style={{ padding: 0.2, backgroundColor: 'black' }}></View>
             </View>
           );
         }
@@ -240,7 +235,7 @@ const CurrentQuarter = ({ route, navigation }) => {
                 color="dodgerblue">
                 <Text style={StyleSheet.awardsTextStyle}>{x.Title}</Text>
               </Unorderedlist>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
                 <Icon style={{ marginLeft: 20 }} name="edit" size={20} color="#900" onPress={() => {
                   navigation.navigate('addNewData', {
                     userUid: UID,
@@ -250,14 +245,15 @@ const CurrentQuarter = ({ route, navigation }) => {
                     prevId: x.docId,
                   });
                 }} />
-                <Text onPress={() => {
+                <DeleteIcon style={{ marginLeft: 20 }} name="delete" size={20} color="#900" onPress={() => {
                   db.collection("Users/" + UID + "/UserData").doc(x.docId).delete().then(() => {
                     navigation.navigate('dashboard', {
                       userUid: UID,
                     });
                   })
-                }}>X</Text>
+                }} />
               </View>
+              <View style={{ padding: 0.2, backgroundColor: 'black' }}></View>
             </View>
           );
         }

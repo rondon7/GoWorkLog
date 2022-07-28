@@ -1,7 +1,8 @@
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import Login from './src/components/Login';
+import Initial from './src/components/Initial';
 import Signup from './src/components/Signup';
 import Dashboard from './src/components/Dashboard';
 import CurrentQuarter from './src/components/CurrentQuarter';
@@ -10,6 +11,7 @@ import AddNewData from './src/components/AddNewData';
 import QuarterDetails from './src/components/QuarterDetails';
 import NewQuarterConfirmation from './src/components/NewQuarterConfirmation';
 import ErrorBoundary from './helpers/ErrorBoundary';
+import RNBootSplash from 'react-native-bootsplash';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +22,11 @@ export default function App() {
 const MyStack = () => {
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="login">
+      <Stack.Navigator initialRouteName="initial">
+        <Stack.Screen name="initial" component={Initial} options={{
+          title: '',
+          headerShown: false
+        }} />
         <Stack.Screen name="login" component={Login} options={{
           title: 'Login',
         }} />

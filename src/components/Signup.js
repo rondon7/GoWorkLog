@@ -1,7 +1,8 @@
-import React, {useState, useLayoutEffect} from 'react';
-import {StyleSheet, Text, View, TextInput, Button} from 'react-native';
+import React, { useState, useLayoutEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import getCurrentQuarter from '../../helpers/getCurrentQuarter';
 const currentYear = getCurrentQuarter().Year;
@@ -21,7 +22,7 @@ const Signup = ({ navigation }) => {
   });
 
   const updateInputVal = (val, prop) => {
-    setUserDetails({...userDetails, [prop]: [val]});
+    setUserDetails({ ...userDetails, [prop]: [val] });
   };
 
   const registerUser = () => {
@@ -36,6 +37,7 @@ const Signup = ({ navigation }) => {
         .then(res => {
           const UID = res.user.uid;
           console.log(UID);
+          AsyncStorage.setItem('curUser', UID);
           console.log(
             'User ',
             userDetails.displayName[0],
@@ -55,7 +57,7 @@ const Signup = ({ navigation }) => {
                 password: '',
               });
               navigation.navigate('dashboard', {
-                userUid : UID,
+                userUid: UID,
               });
             })
             .catch(error => console.log(error));
