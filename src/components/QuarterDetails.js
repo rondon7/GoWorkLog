@@ -1,7 +1,7 @@
-import {Text, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import { Text, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import Unorderedlist from 'react-native-unordered-list';
-import {Card} from '@rneui/themed';
-import React, {useEffect, useState} from 'react';
+import { Card } from '@rneui/themed';
+import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Header from './Header';
 
@@ -15,14 +15,13 @@ const currentYear = getCurrentQuarter().Year;
 const currentQuarterNo = getCurrentQuarter().Quarter;
 
 const QuarterDetails = ({ route, navigation }) => {
-  
+
   const [userName, setUserName] = useState('');
   const [userData, setUserData] = useState([]);
 
   useEffect(() => {
     if (route && route.params.userUid) {
       const UID = route.params.userUid + '';
-      console.log('1', UID);
       usersCollection
         .doc(UID)
         .get()
@@ -30,7 +29,6 @@ const QuarterDetails = ({ route, navigation }) => {
           setUserName(doc.data().Username);
         });
       const quarterDocRef = quartersCollection.doc(route.params.year + 'Q' + route.params.quarterNo);
-      console.log('2', quarterDocRef);
       db.collection('Users/' + UID + '/UserData')
         .where('Quarter', '==', quarterDocRef)
         .get()
@@ -51,7 +49,6 @@ const QuarterDetails = ({ route, navigation }) => {
   const RenderCompletedTasks = () => {
     if (userData.length > 0) {
       return userData.map(x => {
-        console.log('3', x);
         return (x.isFinished == true &&
           <Unorderedlist
             style={styles.CheckBoxStyle}

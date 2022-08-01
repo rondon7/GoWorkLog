@@ -36,7 +36,6 @@ const Signup = ({ navigation }) => {
         )
         .then(res => {
           const UID = res.user.uid;
-          console.log(UID);
           AsyncStorage.setItem('curUser', UID);
           console.log(
             'User ',

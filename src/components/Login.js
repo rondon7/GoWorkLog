@@ -11,18 +11,17 @@ const Login = ({ navigation }) => {
     password: '',
   });
 
-  // useEffect(() => {
-  //   const find = async () => {
-  //     let UID = await AsyncStorage.getItem('curUser');
-  //     console.log('UID', UID);
-  //     if (UID) {
-  //       navigation.navigate('dashboard', {
-  //         userUid: UID,
-  //       });
-  //     }
-  //   };
-  //   find();
-  // }, []);
+  useEffect(() => {
+    const find = async () => {
+      let UID = await AsyncStorage.getItem('curUser');
+      if (UID) {
+        navigation.navigate('dashboard', {
+          userUid: UID,
+        });
+      }
+    };
+    find();
+  }, []);
 
   const updateInputVal = (val, prop) => {
     setUserDetails({ ...userDetails, [prop]: [val] });

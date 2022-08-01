@@ -1,5 +1,5 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import Header from './Header';
 const db = firestore();
@@ -23,7 +23,7 @@ const Dashboard = ({ route, navigation }) => {
 
   return (
     <View style={styles.ButtonListStyle}>
-      <Header userName={userName} navigation={ navigation } />
+      <Header userName={userName} navigation={navigation} />
       <TouchableOpacity
         style={[styles.ButtonStyle, styles.CurrentButtonStyle]}
         onPress={() => {
@@ -46,17 +46,6 @@ const Dashboard = ({ route, navigation }) => {
           <Text style={styles.ButtonTextStyle}>Your Previous Quarters</Text>
         </View>
       </TouchableOpacity>
-      {/* <TouchableOpacity
-        style={[styles.ButtonStyle, styles.NewButtonStyle]}
-        onPress={() => {
-          navigation.navigate('addNewQuarter', {
-            userUid: route.params.userUid,
-          });
-        }}>
-        <View style={styles.ButtonTextViewStyle}>
-          <Text style={styles.ButtonTextStyle}>Start a New Quarter</Text>
-        </View>
-      </TouchableOpacity> */}
     </View>
   );
 };

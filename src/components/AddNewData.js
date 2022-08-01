@@ -46,7 +46,8 @@ const AddNewData = ({ route, navigation }) => {
     } else {
       if (route && route.params.userUid) {
         const UID = route.params.userUid;
-        if (route.params.updation == true) {
+        console.log("Updation", route.params.updation);
+        if (route.params.updation === true) {
           console.log("Prev Id", route.params.prevId);
           db.collection("Users/" + UID + "/UserData").doc(route.params.prevId).update({ Title: dataValue }).then(() => {
             navigation.navigate('currentQuarter', {

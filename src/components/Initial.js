@@ -7,7 +7,6 @@ const Initial = ({ navigation }) => {
     useEffect(() => {
         const find = async () => {
             let UID = await AsyncStorage.getItem('curUser');
-            console.log('UID', UID);
             if (UID) {
                 navigation.navigate('dashboard', {
                     userUid: UID,
