@@ -17,7 +17,7 @@ const usersCollection = db.collection('Users');
 import getCurrentQuarter from '../../helpers/getCurrentQuarter';
 const currentYear = getCurrentQuarter().Year;
 const currentQuarterNo = getCurrentQuarter().Quarter;
-const initialYear = '2022';
+// const initialYear = '2022';
 const initialQuarterNo = '1';
 
 const PreviousQuarters = ({ route, navigation }) => {
@@ -34,20 +34,30 @@ const PreviousQuarters = ({ route, navigation }) => {
         .get()
         .then(doc => {
           setUserName(doc.data().Username);
-        });
-      for (let i = parseInt(currentYear); i >= parseInt(initialYear); --i) {
-        for (let j = 4; j >= 1; --j) {
-          if ((i == parseInt(currentYear)) && (j >= parseInt(currentQuarterNo))) {
-            continue;
+          console.log('xxyxyyxyxyxy', doc.data().InitialActiveQuarter._documentPath._parts[1]);
+          const initialQuarterNo = doc.data().InitialActiveQuarter._documentPath._parts[1].charAt(5) + '';
+          const initialYear = doc.data().InitialActiveQuarter._documentPath._parts[1].slice(0, 4) + '';
+          console.log(initialQuarterNo, '--->', initialYear);
+          for (let i = parseInt(currentYear); i >= parseInt(initialYear); --i) {
+            let flag = false;
+            for (let j = 4; j >= 1; --j) {
+              if ((i == parseInt(currentYear)) && (j >= parseInt(currentQuarterNo)))
+                continue;
+              if ((i <= initialYear) && (j < initialQuarterNo)) {
+                flag = true;
+                break;
+              }
+              const tempObj = {
+                cardTitle: 'Quarter ' + j + ' - ' + i,
+                quarterNo: (j + ''),
+                year: (i + ''),
+              };
+              setPreviousQuartersTitles(oldArray => [...oldArray, tempObj]);
+            }
+            if (flag)
+              break;
           }
-          const tempObj = {
-            cardTitle: 'Quarter ' + j + ' - ' + i,
-            quarterNo: (j + ''),
-            year: (i + ''),
-          };
-          setPreviousQuartersTitles(oldArray => [...oldArray, tempObj]);
-        }
-      }
+        });
       // db.collection('Users/' + UID + 'UserData').get().then(querySnapshot => {
       //   console.log(querySnapshot, previousQuartersTitles);
       //   for (let doc of querySnapshot) {

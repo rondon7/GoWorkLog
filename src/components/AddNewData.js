@@ -46,9 +46,7 @@ const AddNewData = ({ route, navigation }) => {
     } else {
       if (route && route.params.userUid) {
         const UID = route.params.userUid;
-        console.log("Updation", route.params.updation);
         if (route.params.updation === true) {
-          console.log("Prev Id", route.params.prevId);
           db.collection("Users/" + UID + "/UserData").doc(route.params.prevId).update({ Title: dataValue }).then(() => {
             navigation.navigate('currentQuarter', {
               userUid: route.params.userUid,
@@ -127,8 +125,7 @@ const AddNewData = ({ route, navigation }) => {
         style={styles.cancelButtonStyle}
         onPress={() => {
           navigation.navigate('currentQuarter', {
-            username: route.params.username,
-            currentQuarter: route.params.currentQuarter,
+            userUid: route.params.userUid,
           });
         }}>
         <Text style={styles.cancelButtonTextStyle}>Cancel</Text>
