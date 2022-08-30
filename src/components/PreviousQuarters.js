@@ -5,8 +5,9 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  TextInput,
 } from 'react-native';
-import { Card } from '@rneui/themed';
+import { Dropdown } from 'react-native-element-dropdown';
 import React, { useState, useEffect } from 'react';
 import Header from './Header';
 
@@ -17,14 +18,30 @@ const usersCollection = db.collection('Users');
 import getCurrentQuarter from '../../helpers/getCurrentQuarter';
 const currentYear = getCurrentQuarter().Year;
 const currentQuarterNo = getCurrentQuarter().Quarter;
-// const initialYear = '2022';
-const initialQuarterNo = '1';
+
+const years = [
+  { label: 'All', value: 'All' },
+  { label: '2022', value: '2022' },
+  { label: '2023', value: '2023' },
+  { label: '2024', value: '2024' },
+  { label: '2025', value: '2025' },
+  { label: '2026', value: '2026' },
+  { label: '2027', value: '2027' },
+  { label: '2028', value: '2028' },
+  { label: '2029', value: '2029' },
+];
+
+const yearsForFilter = ['2029', '2028', '2027', '2026', '2025', '2024', '2023', '2022'];
+
+const quartersForFilter = ['4', '3', '2', '1'];
 
 const PreviousQuarters = ({ route, navigation }) => {
 
   const [previousQuartersTitles, setPreviousQuartersTitles] = useState([]);
-  // const [previousQuartersData, setPreviousQuartersData] = useState([]);
   const [userName, setUserName] = useState('');
+  const [yearFilter, setYearFilter] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
+  const [keyword, setKeyword] = useState('');
 
   useEffect(() => {
     if (route && route.params.userUid) {
@@ -34,10 +51,93 @@ const PreviousQuarters = ({ route, navigation }) => {
         .get()
         .then(doc => {
           setUserName(doc.data().Username);
-          console.log('xxyxyyxyxyxy', doc.data().InitialActiveQuarter._documentPath._parts[1]);
+        });
+    }
+  }, [route]);
+
+  const renderLabel = () => {
+    if (yearFilter || isFocus) {
+      return (
+        <Text style={[styles.label, isFocus && { color: 'black' }]}>
+          Year
+        </Text>
+      );
+    }
+    return null;
+  };
+
+  const DropdownComponent = () => {
+    return (
+      <View style={[styles.container, styles.yearFilter]}>
+        {renderLabel()}
+        <Dropdown
+          style={[styles.dropdown, isFocus && { borderColor: 'black' }]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          data={years}
+          search
+          maxHeight={300}
+          labelField="label"
+          valueField="value"
+          placeholder={!isFocus ? 'Year' : '...'}
+          searchPlaceholder="Find"
+          value={yearFilter}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={item => {
+            setYearFilter(item.value);
+            setIsFocus(false);
+          }}
+        />
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    const UID = route.params.userUid + '';
+    if (keyword.length > 0) {
+      db.collection("Users/" + UID + "/UserData").get().then(snapshot => {
+        let tempArray = [];
+        yearsForFilter.forEach(year => {
+          quartersForFilter.forEach(quarter => {
+            snapshot.docs.every(doc => {
+              const docData = doc.data();
+              if (docData.Title.includes(keyword)) {
+                const tempQuarterNo = docData.Quarter._documentPath._parts[1].charAt(5);
+                const tempYear = docData.Quarter._documentPath._parts[1].slice(0, 4);
+                if (tempQuarterNo == quarter && tempYear == year) {
+                  const tempObj = {
+                    cardTitle: 'Quarter '
+                      + tempQuarterNo
+                      + ' - '
+                      + tempYear,
+                    quarterNo: (tempQuarterNo + ''),
+                    year: (tempYear + ''),
+                  };
+                  if (yearFilter && (!(yearFilter === 'All')) && yearFilter == tempYear) {
+                    tempArray.push(tempObj);
+                  } else if ((!yearFilter) || (yearFilter === 'All')) {
+                    tempArray.push(tempObj);
+                  }
+                  return false;
+                }
+              }
+              return true;
+            })
+          })
+        })
+        setPreviousQuartersTitles(tempArray);
+      })
+    } else {
+      usersCollection
+        .doc(UID)
+        .get()
+        .then(doc => {
           const initialQuarterNo = doc.data().InitialActiveQuarter._documentPath._parts[1].charAt(5) + '';
           const initialYear = doc.data().InitialActiveQuarter._documentPath._parts[1].slice(0, 4) + '';
-          console.log(initialQuarterNo, '--->', initialYear);
+          let tempArray = [];
           for (let i = parseInt(currentYear); i >= parseInt(initialYear); --i) {
             let flag = false;
             for (let j = 4; j >= 1; --j) {
@@ -52,31 +152,19 @@ const PreviousQuarters = ({ route, navigation }) => {
                 quarterNo: (j + ''),
                 year: (i + ''),
               };
-              setPreviousQuartersTitles(oldArray => [...oldArray, tempObj]);
+              if (yearFilter && (!(yearFilter === 'All')) && yearFilter == i) {
+                tempArray.push(tempObj);
+              } else if ((!yearFilter) || (yearFilter === 'All')) {
+                tempArray.push(tempObj);
+              }
             }
             if (flag)
               break;
           }
+          setPreviousQuartersTitles(tempArray);
         });
-      // db.collection('Users/' + UID + 'UserData').get().then(querySnapshot => {
-      //   console.log(querySnapshot, previousQuartersTitles);
-      //   for (let doc of querySnapshot) {
-      //     for (x of previousQuartersTitles) {
-      //       if ((x.quarterNo == (doc.data().Quarter._documentPath._parts[1].charAt(5) + ''))
-      //         && (x.year == (doc.data().Quarter._documentPath._parts[1].slice(0, 4) + ''))) { 
-      //         continue;
-      //       } else {
-      //         const tempObj = {
-      //           Title: doc.data().Title,
-      //           quarterNo: (j + ''),
-      //           year: (i + ''),
-      //         };
-      //       }
-      //     };
-      //   };
-      // });
     }
-  }, [route]);
+  }, [keyword, yearFilter])
 
   const RenderPreviousQuarters = () => {
     if (previousQuartersTitles.length > 0) {
@@ -104,6 +192,16 @@ const PreviousQuarters = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Header userName={userName} navigation={navigation} />
+        <View style={styles.filters}>
+          <TextInput
+            style={styles.input}
+            onChangeText={(newKeyword) => setKeyword(newKeyword)}
+            value={keyword}
+            placeholder="Search by Keyword"
+            keyboardType="alphanumeric"
+          />
+          {DropdownComponent()}
+        </View>
         <View style={styles.ButtonListStyle}>{RenderPreviousQuarters()}</View>
       </ScrollView>
     </SafeAreaView>
@@ -119,6 +217,10 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingHorizontal: 10,
   },
+  filters: {
+    flex: 1,
+    flexDirection: 'row'
+  },
   ButtonListStyle: {
     flex: 1,
     flexDirection: 'column',
@@ -129,12 +231,56 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: 'gainsboro',
     padding: 15,
-    // elevation: 3,
-    // borderColor: 'black',
   },
   cardTitleStyle: {
     fontSize: 25,
     color: 'black',
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
+  yearFilter: {
+    flexBasis: '25%'
+  },
+  input: {
+    height: 50,
+    margin: 8,
+    marginTop: 20,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 8,
+    borderColor: 'gray',
+    flexBasis: '65%'
   },
 });
 

@@ -25,10 +25,11 @@ const MyStack = () => {
       <Stack.Navigator initialRouteName="initial">
         <Stack.Screen name="initial" component={Initial} options={{
           title: '',
-          headerShown: false
+          headerShown: false,
         }} />
         <Stack.Screen name="login" component={Login} options={{
           title: 'Login',
+          headerBackVisible: false,
         }} />
         <Stack.Screen name="signup" component={Signup} options={{
           headerBackVisible: false,

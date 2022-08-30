@@ -5,6 +5,10 @@ import Header from './Header';
 const db = firestore();
 const usersCollection = db.collection('Users');
 
+import getCurrentQuarter from '../../helpers/getCurrentQuarter';
+const currentYear = getCurrentQuarter().Year;
+const currentQuarterNo = getCurrentQuarter().Quarter;
+
 const Dashboard = ({ route, navigation }) => {
 
   const [userName, setUserName] = useState('');
@@ -19,7 +23,7 @@ const Dashboard = ({ route, navigation }) => {
           setUserName(doc.data().Username);
         });
     }
-  }, [route]);
+  }, []);
 
   return (
     <View style={styles.ButtonListStyle}>
@@ -32,7 +36,9 @@ const Dashboard = ({ route, navigation }) => {
           });
         }}>
         <View style={styles.ButtonTextViewStyle}>
-          <Text style={styles.ButtonTextStyle}>Your Current Quarter</Text>
+          <Text style={styles.ButtonTextStyle}>Ongoing Quarter:</Text>
+          <Text style={styles.ButtonTextStyle}>Quarter {currentQuarterNo}</Text>
+          <Text style={styles.ButtonTextStyle}>{currentYear}</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -62,7 +68,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10,
     alignItems: 'center',
-    paddingTop: 50,
+    // paddingTop: 50,
     alignContent: 'center',
     borderRadius: 18,
   },
